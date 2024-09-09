@@ -1,6 +1,6 @@
 name: flutter_local_prefs
-description: "A new Flutter plugin project."
-version: 0.0.1
+description: "A Flutter plugin to manage local preferences using UserDefaults and SharedPreferences."
+version: 0.0.2
 homepage:
 
 environment:
