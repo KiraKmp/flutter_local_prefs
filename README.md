@@ -5,6 +5,8 @@ This Flutter plugin allows you to securely store, retrieve, and manage local pre
 
 # Pre-Requisites
 
+
+
 ### Android
 Ensure your `minSdkVersion` is set to 19 or higher in your `android/app/build.gradle`:
 ```
