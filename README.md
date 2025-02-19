@@ -1,97 +1,183 @@
-
 # flutter_local_prefs [![pub package](https://img.shields.io/pub/v/flutter_local_prefs.svg)](https://pub.dev/packages/flutter_local_prefs)
 
-This Flutter plugin allows you to securely store, retrieve, and manage local preferences, including strings, integers, booleans, and more, across both Android and iOS platforms. All preferences are encrypted to ensure data protection and privacy on the device.
+**flutter_local_prefs** is a Flutter plugin that allows you to securely store, retrieve, and manage local preferences across both **Android** and **iOS** platforms. With this package, you can maintain **two categories** of data:
 
-# Pre-Requisites
+1. **Persistent Data** (`isPersistent: true`) – remains even after logout or app restarts.
+2. **Non-Persistent Data** (`isPersistent: false`) – cleared when you decide (e.g., during logout).
+
+All stored preferences are **encrypted**, ensuring data protection and privacy.
+
+---
+
+## 📌 Why Use Persistent and Non-Persistent Data?
+Sometimes you may want **certain preferences** (e.g., user settings) to remain even after logout, but clear **others** (e.g., user session tokens). By separating your data into **persistent** and **non-persistent**, you can easily control which data to keep or remove.
+
+---
+
+## 📢 Pre-Requisites
 
 ### Android
-Ensure your `minSdkVersion` is set to 19 or higher in your `android/app/build.gradle`:
-```
+Ensure your `minSdkVersion` is set to `19` or higher in your `android/app/build.gradle`:
+```gradle
 minSdkVersion 19
 ```
 
 ### iOS
-Minimum supported iOS version is 12.0. Ensure this is set in your iOS project configuration.
+Ensure the minimum supported iOS version is **12.0** in your project configuration.
 
-# Get Started
+---
 
-### Installation
-Add the dependency to your `pubspec.yaml`.
+## 🚀 Installation
+Add the dependency to your `pubspec.yaml`:
 ```yaml
 dependencies:
-  flutter_local_prefs: ^0.0.1
+  flutter_local_prefs: ^0.0.4
 ```
 
-### Import
+Then import the package:
 ```dart
 import 'package:flutter_local_prefs/flutter_local_prefs.dart';
 ```
 
-# Usage
+---
 
-Below are usage examples :
+## 💾 Storing Data
 
-Initialize FlutterLocalPrefs instance
+### Persistent Data (e.g., keep after logout)
 ```dart
-// Initialize instance
+// Create an instance
 FlutterLocalPrefs flutterLocalPrefs = FlutterLocalPrefs();
+
+// Save a persistent string
+await flutterLocalPrefs.saveData(
+  object: "Welcome!",
+  key: "welcomeMessage",
+  isPersistent: true,
+);
+
+// Save a persistent boolean
+await flutterLocalPrefs.saveData(
+  object: true,
+  key: "darkModeEnabled",
+  isPersistent: true,
+);
 ```
 
-Save and Retrieve String Example
+### Non-Persistent Data (e.g., clear on logout)
+```dart
+// Save a non-persistent (temporary) token
+await flutterLocalPrefs.saveData(
+  object: "ABC123",
+  key: "sessionToken",
+  isPersistent: false,
+);
+```
+
+---
+
+## 📥 Retrieving Data
 
 ```dart
-// Save data
-await flutterLocalPrefs.saveData(object: "objects", key: "test");
-// Retrieve string data
-String key = await flutterLocalPrefs.getString(key: "test");
-```
-Save and Retrieve Integer Example
+// Retrieve persistent data
+String message = await flutterLocalPrefs.getString(
+  key: "welcomeMessage",
+  isPersistent: true,
+);
 
+bool darkMode = await flutterLocalPrefs.getBool(
+  key: "darkModeEnabled",
+  isPersistent: true,
+);
+
+// Retrieve non-persistent data
+String sessionToken = await flutterLocalPrefs.getString(
+  key: "sessionToken",
+  isPersistent: false,
+);
+```
+
+---
+
+## 🗑 Removing Data
+
+### Remove Non-Persistent Data During Logout
+If you only want to clear **non-persistent** data at logout (like session info), use:
 ```dart
-// Save integer data
-await flutterLocalPrefs.saveData(object: 42, key: "testInt");
-// Retrieve integer data
-int intData = await flutterLocalPrefs.getInt(key: "testInt");
+await flutterLocalPrefs.removeAll(
+  isPersistent: false,
+);
 ```
-Save and Retrieve Boolean Example
+This **removes all** data that was saved with `isPersistent: false`, while **keeping** data marked `isPersistent: true`.
 
+### Remove Persistent Data
+If you also want to remove everything that was saved as **persistent**, call:
 ```dart
-// Save boolean data
-await flutterLocalPrefs.saveData(object: true, key: "testBool");
-// Retrieve boolean data
-bool boolData = await flutterLocalPrefs.getBool(key: "testBool");
+await flutterLocalPrefs.removeAll(
+  isPersistent: true,
+);
 ```
-Save and Retrieve Double Example
+This clears **all** data with `isPersistent: true`.
 
+### Remove Specific Key
 ```dart
-// Save double data
-await flutterLocalPrefs.saveData(object: 3.14, key: "testDouble");
-// Retrieve double data
-double doubleData = await flutterLocalPrefs.getDouble(key: "testDouble");
-```
-Remove Data Example
+// Remove a single persistent key
+await flutterLocalPrefs.remove(
+  key: "darkModeEnabled",
+  isPersistent: true,
+);
 
+// Remove a single non-persistent key
+await flutterLocalPrefs.remove(
+  key: "sessionToken",
+  isPersistent: false,
+);
+```
+
+---
+
+## ❓ Check if Key Exists
 ```dart
-// Remove specific key-value pair
-await flutterLocalPrefs.remove(key: "testString");
-// Remove all stored preferences
-await flutterLocalPrefs.removeAll();
+bool isDarkModeExists = await flutterLocalPrefs.contain(
+  key: "darkModeEnabled",
+  isPersistent: true,
+);
+
+bool hasSessionToken = await flutterLocalPrefs.contain(
+  key: "sessionToken",
+  isPersistent: false,
+);
 ```
-Check if a Key Exists Example
 
-```dart
-// Check if data exists for the key
-bool exists = await flutterLocalPrefs.contain(key: "testString");
-```
+---
 
+## 📚 API Reference
 
+| Method                                                                       | Description                                                                                                                |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `saveData({required Object object, required String key, bool isPersistent})` | Saves an object (`String`, `int`, `bool`, `double`, `long`) under a specific key. Set `isPersistent: true` for permanent. |
+| `getInt({required String key, bool isPersistent})`                           | Retrieves an integer value. Use `isPersistent: true` for persistent data.                                                 |
+| `getString({required String key, bool isPersistent})`                        | Retrieves a string value.                                                                                                 |
+| `getBool({required String key, bool isPersistent})`                          | Retrieves a boolean value.                                                                                                |
+| `getDouble({required String key, bool isPersistent})`                        | Retrieves a double value.                                                                                                 |
+| `getLong({required String key, bool isPersistent})`                          | Retrieves a long integer value.                                                                                           |
+| `contain({required String key, bool isPersistent})`                          | Checks if a key exists in persistent or non-persistent storage.                                                           |
+| `remove({required String key, bool isPersistent})`                           | Removes a specific key-value pair from persistent or non-persistent storage.                                              |
+| `removeAll({bool isPersistent})`                                             | Clears **all** data in either persistent or non-persistent storage.                                                       |
 
-### Detailed Functions:
-- **saveData**: Saves an object (String, int, bool, etc.) under a specific key.
-- **getInt / getString / getBool / getDouble / getLong**: Retrieve data of the specified type.
-- **remove**: Deletes the data stored with the specified key.
-- **removeAll**: Deletes all stored data.
-- **contain**: Checks if data with the specified key exists.
+---
 
-For a full API reference, please visit the official documentation.
+## 📌 Usage Example
+
+A typical logout flow might:
+1. **Remove all** non-persistent data (e.g., session tokens) so the user is effectively logged out.
+2. **Keep** certain persistent preferences (e.g., user’s theme settings or saved language preference).
+
+If you also want to wipe out **persistent** data, simply call `removeAll(isPersistent: true)`.
+
+---
+
+## 📜 License
+This project is licensed under the **MIT License**.
+
+For a full API reference, visit the [official documentation](https://pub.dev/packages/flutter_local_prefs).
+

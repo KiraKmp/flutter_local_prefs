@@ -1,6 +1,6 @@
 name: flutter_local_prefs
 description: "A Flutter plugin to manage local preferences using UserDefaults and SharedPreferences."
-version: 0.0.3
+version: 0.0.4
 homepage:
 repository: https://github.com/KiraKmp/flutter_local_prefs
 
